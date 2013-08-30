@@ -39,13 +39,13 @@
       [:div.row
        [:div.col-md-12
         content
-        [:div.disqus_thread]
+        [:div#disqus_thread]
         [:script {:type "text/javascript"}
          "var disqus_shortname = 'crsmithdev';"
+         "var disqus_identifier = 'http://crsmithdev.com' + window.location.pathname;"
+         "var disqus_url = disqus_identifier;"
          "(function() {"
             "var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;"
-            "var disqus_identifier = 'http://crsmithdev.github.com/blog/2013/03/26/building-better-email-habits-with-mailbox/';"
-            "var disqus_url = 'http://crsmithdev.github.com/blog/2013/03/26/building-better-email-habits-with-mailbox/';"
             "dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';"
             "(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);"
          "})();"]]]
