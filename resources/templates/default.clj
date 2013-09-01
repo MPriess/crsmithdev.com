@@ -11,6 +11,8 @@
   [:link {:rel "shortcut icon" :href "/images/favicon.ico" :type "image/x-icon"}]
   [:link {:rel "stylesheet" :type "text/css" :href "//cdnjs.cloudflare.com/ajax/libs/font-awesome/3.2.1/css/font-awesome.min.css"}]
   [:link {:rel "stylesheet" :type "text/css" :href "/css/bootstrap.min.css"}]
+  [:link {:rel "stylesheet" :type "text/css" :href "/css/github.css"}]
+  [:link {:rel "stylesheet" :type "text/css" :href "http://fonts.googleapis.com/css?family=Source+Code+Pro|Open+Sans"}]
   [:link {:rel "stylesheet" :type "text/css" :href "/css/crsmithdev.css"}]
   [:title (:title metadata)]]
  [:body
@@ -52,7 +54,8 @@
       content)
     [:script {:src "//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"}]
     [:script {:src "//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.0-rc2/js/bootstrap.min.js"}]
-    [:script {:src "//cdnjs.cloudflare.com/ajax/libs/highlight.js/7.3/highlight.min.js"}]
+    [:script {:src "https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"}]
+    [:script {:src "https://google-code-prettify.googlecode.com/svn/trunk/src/lang-clj.js"}]
     [:script {:src "/js/crsmithdev.js"}]
     [:script {:type "text/javascript"}
      "(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){"

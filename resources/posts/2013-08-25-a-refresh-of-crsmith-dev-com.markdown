@@ -35,27 +35,31 @@ Static is a very simple static site generator, with full documentation that span
 
 Here's all that's needed to get started with Static:
 
-	git clone https://github.com/nakkaya/static.git
-	cd static
-	lein deps
-	lein uberjar
+<!--?prettify lang=sh-->
+
+    git clone https://github.com/nakkaya/static.git
+    cd static
+    lein deps
+    lein uberjar
 
 This results with a .jar named `static-app.jar` in the `target` directory, which can then be moved into a fresh site repo:
 
-	mkdir crsmithdev.com
-	git init
-	cp ../static/target/static-app.jar .
+<!--?prettify lang=sh-->
+
+    mkdir crsmithdev.com
+    git init
+    cp ../static/target/static-app.jar .
 	
 Here's the minimum directory structure and files necessary to start building a site:
 
-	.
-	|-- config.clj
-	`-- resources
-		|-- posts
-		|-- public
-		|-- site
-		|-- templates
-			`-- default.clj
+    .
+    |-- config.clj
+    `-- resources
+        |-- posts
+        |-- public
+        |-- site
+        |-- templates
+            `-- default.clj
 
 A brief description of what all these are:
 
@@ -67,36 +71,44 @@ A brief description of what all these are:
 
 All that's needed to build the site is this:
 
-	java -jar static-app.jar --build
+<!--?prettify lang=sh-->
+
+    java -jar static-app.jar --build
 
 Or, to rebuild automatically when something is changed:
 
-	java -jar static-app.jar --watch
+<!--?prettify lang=sh-->
+
+    java -jar static-app.jar --watch
 
 This will result in an 'html' directory appearing in the root of the site, containing the rendered HTML pages.  I found pointing my local nginx at this folder to be the best way to serve the site locally, although Static does offer a `--jetty` option to run it as well.
 
 Blog post configuration is extremely simple, and should be familiar to anyone who has used Markdown for blogging.  Each post will simple require a short header with a few configuration values, as shown here:
 
-	---
-	title: Building Better Email Habits with Mailbox
-	---
+    ---
+    title: Building Better Email Habits with Mailbox
+    ---
 
 Static's [documentation](http://nakkaya.com/static.html) lists a few more options for the post header, allowing the specification of tags, an alias, and use of non-default templates.
 
 ### HTML templating with Hiccup
 
-	[:html
-	 {:xmlns "http://www.w3.org/1999/xhtml" :lang "en" :xml:lang "en"}
-	 [:head
-	  [:meta {:http-equiv "content-type" :content "text/html; charset=UTF-8"}]
-	  [:meta {:name "description" :content (:description metadata)}]
-	  [:meta {:name "keywords" :content (:tags metadata)}]
-	  [:meta {:name "author" :content "Chris Smith"}]
-	  [:meta {:name "viewport" :content "width=device-width, initial-scale=1.0"}]
-	  [:link {:rel "icon" :href "/images/favicon.ico" :type "image/x-icon"}]
-	  [:link {:rel "shortcut icon" :href "/images/favicon.ico" :type "image/x-icon"}]
+<!--?prettify lang=clj-->
+
+    [:html
+     {:xmlns "http://www.w3.org/1999/xhtml" :lang "en" :xml:lang "en"}
+     [:head
+      [:meta {:http-equiv "content-type" :content "text/html; charset=UTF-8"}]
+      [:meta {:name "description" :content (:description metadata)}]
+      [:meta {:name "keywords" :content (:tags metadata)}]
+      [:meta {:name "author" :content "Chris Smith"}]
+      [:meta {:name "viewport" :content "width=device-width, initial-scale=1.0"}]
+      [:link {:rel "icon" :href "/images/favicon.ico" :type "image/x-icon"}]
+      [:link {:rel "shortcut icon" :href "/images/favicon.ico" :type "image/x-icon"}]
 
 Note the access of the `:description` and `:tags` from `metadata`.
+
+<!--?prettify lang=clj-->
 
 	[:div.content
 	 [:div.container
@@ -106,10 +118,12 @@ Note the access of the `:description` and `:tags` from `metadata`.
 		  content
 		  [:div#disqus_thread]
 		  [:script {:type "text/javascript"}
-		   "// ...JS for Disqus"]]]
+		   "// ... (disqus js)"]]]
 		content)
 
 Here, some extra structure for Bootstrap, and the embedded code for Disqus, are injected in the page, but only if its `metadata` `:type` indicates that it is a post.  Also, note the terse syntax for Hiccup:  this is actually a 'short' form of ID / class specification it offers, which makes these two forms equivalent:
+
+<!--?prettify lang=clj-->
 
 	[:div {:class "col-md-12"} "..."]
 	[:div.col-md-12 "..."]
@@ -124,53 +138,98 @@ Although Bootstrap does include the free version of [Glyphicons](http://glyphico
 
 While there are some JS libraries for the GitHub API, my needs were quite simple here and I was unwilling to introduce more dependencies for a simple, static site.  As there's no need to register with GitHub to use the part of the API I was needing, it should be possible to retrieve, parse and display a list of recent activity using a single `$.ajax` request and some vanilla JavaScript.
 
-My activity on GitHub can be publicly accessed via their API [here](https://api.github.com/users/crsmithdev/events). Here's the full JS required to pull, parse, and display my recent commits:
+The full code to retrieve, process and display my GitHub commits can be found [here](https://github.com/crsmithdev/crsmithdev.github.com/blob/master/js/crsmithdev.js), but here are some highlights.  I'll need a function to retrieve some JSON from GitHub, transform that data into a list of DOM elements, and then apply those elements to any containers matching a certain CSS selector.  And of course, I'll want to limit the number of commits that are displayed:
 
-	function ghActivity(toShow) {
-		var ghRecents = $('.gh-recent');
+<!--?prettify lang=js-->
 
-		if (ghRecents.length > 0) {
-			$.ajax({
-				url: 'https://api.github.com/users/crsmithdev/events',
-				dataType: 'jsonp',
-				success: function (data) {
-					var shown = 0;
+    var activity = function(sel, n) {
+        var containers = $(sel);
 
-					for (var i = 0; i < data.data.length && shown < toShow; ++i) {
-						var event = data.data[i];
+        if (containers.length > 0) {
+            $.ajax({
+                url: 'https://api.github.com/users/crsmithdev/events',
+                dataType: 'jsonp',
+                success: function (json) {
+                    var elements = commits(json.data, n);
+                    containers.append(elements);
+                }
+            });
+        }
+    };
 
-						if (event.hasOwnProperty('payload') && event.payload.hasOwnProperty('commits')) {
-							for (var j = 0; j < event.payload.commits.length; ++j) {
+For actually generating elements from JSON, I could have used libraries like [underscore.js](http://underscorejs.org) and [moment.js](http://momentjs.org) to handle things like iteration, templating and date formatting, and I normally would have these in scope in a larger project.  Here, though, I see little reason to involve two more libraries for a few simple operations.  Parsing the JSON is straightforward, as every event that involves a commit will have a `payload.commit` property containing an array of commmits.  Using arrays and a native `.join()` function should be preferred to string concatenation, in the absence of templating:
 
-								var commit_message = event.payload.commits[0].message;
-								var commit_url = 'https://github.com/' + event.repo.name + '/commit/' + event.payload.commits[0].sha;
-								var repo_name = event.repo.name.split('/')[1];
-								var parts = event.created_at.split('T')[0].split('-');
-								var year = parts[0], month = parts[1], day = parts[2];
-								var month_name = ['January', 'Febuary', 'March', 'April', 'May', 'June',
-								  'July', 'August', 'September', 'October', 'November', 'December'][parseInt(month) - 1];
+<!--?prettify lang=js-->
 
-								html = '<div><div><a href=\"' + commit_url + '\">' + commit_message + '</a>';
-								html += ' <span class=\"text-muted\">' + repo_name + '</span></div>';
-								html += '<div>' + day + ' ' + month_name + ' ' + year + '</div></div>';
+    var repo = event.repo.name.split('/')[1];
+    var date = toDateString(event.created_at);
 
-								ghRecents.append($(html));
-								++shown;
-							}
-						}
-					}
-				}
-			});
-		}
-	}
+    for (var j = 0; j < event.payload.commits.length; ++j) {
+        var commit = event.payload.commits[j];
 
-	$(function() {
-		ghActivity(5);
-	});
+        var arr = ['<div><div><a href=https://github.com/"', event.repo.name, '/commit/',
+            commit.sha, '">', commit.message, '</a> <span class="text-muted">', repo,
+            '</span></div>', '<div>', date,	'</div></div>'];
 
-In a larger application, I'd ordinarily have both [underscore.js](http://underscorejs.org/) and [moment.js](http://momentjs.com/), so there be less code involved in iteration and in handling date parsing.  However, as these would only be required for this specific part of the site, it makes more sense to skip them, and handle things manually.  The same applies for constructing the HTML &mdash; in any less-trivial example, I would certainly opt to use some basic templating, as constructing HTML strings manually can be come very ugly, very fast.
+        elements.push($(arr.join('')));
+    }
 
-Essentially, every item in the list returned by the GitHub API should have a `payload` element, which may or may not contain a `commits` array (in the case of simply creating a repo, for example, before pushing to it, there are no commits in the payload).  The JS here simply extracts the repo name, commit message, commit url, and date, then builds a simple HTML string from it and injects it into any divs with a `.ghrecent` class.  Of important note is that the GitHub public API has a very low rate limit for public access (60 / hour / IP), so working on and refreshing the index page repeatedly could cause the API to stop responding with data for a short while until the limit is released.
+Dates are handled with a simple function and an array of month names.  The GitHub API provides dates in ISO 8601 format (YYYY-MM-DDThh:mm:ssZ):
+
+<!--?prettify lang=js-->
+
+    var months = ['January', 'Febuary', 'March', 'April', 'May', 'June', 'July', 'August',
+	    'September', 'October', 'November', 'December'];
+
+    // ...
+
+    var toDateString = function(date) {
+
+        try {
+            var parts = date.split('T')[0].split('-');
+            var month = months[parseInt(parts[1]) - 1];
+            return [parts[2], month, parts[0]].join(' ');
+        }
+        catch (e) {
+            return '???';
+        }
+    };
+
+And of course, all this is wrapped in a module that exposes only one public method, and run when ready:
+
+<!--?prettify lang=js-->
+
+    $(function() {
+        ghActivity.activity('.gh-recent', 5);
+    });
+
+### Syntax Highlighting
+
+Finally, some quality syntax highlighting was needed.  I selected [google-code-prettify](https://code.google.com/p/google-code-prettify/).  All it requires to highlight syntax are a few classes:
+
+<!--?prettify lang=html-->
+
+    <pre class="prettyprint lang-clj"><code>
+       [:h3 "Interests & Areas of Expertise"]
+        [:ul
+         [:li "API design, development and scalability"]
+         [:li "Distributed systems and architecture"]
+         [:li "Functional programming"]
+         ; ...
+    </code></pre>
+
+Unfortunately, as posts are being written in Markdown, I can't add those classes to the automatically generated code blocks, and although I could use literal HTML in Markdown to manually define everything, then I would have to worry about angle brackets and other characters that would have to be escaped.  Fortunately, google-code-prettify allows the use of directives in comments to hint at what should be prettified, and with what language.  This means I can write the Markdown to produce the above like so:
+
+    <!--?prettify lang=clj-->
+
+        [:h3 "Interests & Areas of Expertise"]
+         [:ul
+          [:li "API design, development and scalability"]
+          [:li "Distributed systems and architecture"]
+          [:li "Functional programming"]
+          ; ...
+
+Note that a separate download is required for Clojure support, as it is provided by an extension.
 
 ### Deployment
 

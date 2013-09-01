@@ -1,44 +1,68 @@
-function ghActivity(toShow) {
-    var ghRecents = $('.gh-recent');
+var ghActivity = (function() {
 
-    if (ghRecents.length > 0) {
-        $.ajax({
-            url: 'https://api.github.com/users/crsmithdev/events',
-            dataType: 'jsonp',
-            success: function (data) {
-                var shown = 0;
+    var months = ['January', 'Febuary', 'March', 'April', 'May', 'June', 'July', 'August',
+	'September', 'October', 'November', 'December'];
 
-                for (var i = 0; i < data.data.length && shown < toShow; ++i) {
-                    var r = data.data[i];
+    var activity = function(cls, n) {
+	var containers = $(cls);
 
-		    if (r.hasOwnProperty('payload') && r.payload.hasOwnProperty('commits')) {
+	if (containers.length > 0) {
+	    $.ajax({
+		url: 'https://api.github.com/users/crsmithdev/events',
+		dataType: 'jsonp',
+		success: function (json) {
+		    var elements = commits(json.data, n);
+		    containers.append(elements);
+		}
+	    });
+	}
+    };
 
-			for (var j = 0; j < r.payload.commits.length; ++j) {
+    var toDateString = function(date) {
 
-			    var commit_message = r.payload.commits[0].message;
-			    var commit_url = 'https://github.com/' + r.repo.name + '/commit/' + r.payload.commits[0].sha;
-			    var repo_name = r.repo.name.split('/')[1];
-			    var parts = r.created_at.split('T')[0].split('-');
-			    var year = parts[0], month = parts[1], day = parts[2];
-			    var month_name = ['January', 'Febuary', 'March', 'April', 'May', 'June',
-			      'July', 'August', 'September', 'October', 'November', 'December'][parseInt(month) - 1];
+	try {
+	    var parts = date.split('T')[0].split('-');
+	    var month = months[parseInt(parts[1]) - 1];
+	    return [parts[2], month, parts[0]].join(' ');
+	}
+	catch (e) {
+	    return '???';
+	}
+    };
 
-			    html = '<div><div><a href=\"' + commit_url + '\">' + commit_message + '</a>';
-			    html += ' <span class=\"text-muted\">' + repo_name + '</span></div>';
-			    html += '<div>' + day + ' ' + month_name + ' ' + year + '</div></div>';
+    var commits = function(events, n) {
+	
+	var elements = []
 
-			    ghRecents.append($(html));
-			    ++shown;
-			}
-                    }
-                }
-            }
-        });
-    }
-}
+	for (var i = 0; i < events.length && elements.length < n; ++i) {
+	    var event = events[i];
+
+	    if (event.hasOwnProperty('payload') && event.payload.hasOwnProperty('commits')) {
+
+		var repo = event.repo.name.split('/')[1];
+		var date = toDateString(event.created_at);
+
+		for (var j = 0; j < event.payload.commits.length; ++j) {
+		    var commit = event.payload.commits[j];
+
+		    var arr = ['<div><div><a href=https://github.com/"', event.repo.name, '/commit/',
+			commit.sha, '">', commit.message, '</a> <span class="text-muted">', repo,
+			'</span></div>', '<div>', date,	'</div></div>'];
+
+		    elements.push($(arr.join('')));
+		}
+	    }
+	}
+
+	return elements;
+    };
+
+    return {
+	activity: activity
+    };
+})();
 
 $(function() {
-    hljs.initHighlightingOnLoad();
-    ghActivity(5);
+    ghActivity.activity('.gh-recent', 5);
 });
 
