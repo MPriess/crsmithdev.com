@@ -1,33 +1,35 @@
 ---
 title: A refresh of crsmithdev.com with Bootstrap and Static
-tags: tags
 ---
 
 ## A refresh of crsmithdev.com with Bootstrap 3 and Static
 
 ### Previously
 
-Earlier this year, I finally put a blog up on my domain, having owned it but left it unused for over a year.  I had the simplest possible needs:  it was to be a completely static site, hostable on Github Pages or Dropbox, and the focus of the project was in **no** way to be the technology or process of creating and maintaining the site.  Despite the part of me that automatically geeked out at the opportunity to build my own completely custom static blog generator, the point of the project was to provide myself with a straightforward platform for writing, not to go on a technical adventure in creating one.  Although so far it has only resulted in two posts, including this one, I was successful in putting together something usable, and quickly:  in about 2 hours, I'd set up [Octopress](http://octopress.org) and had it deplying to Pages.  It ended up looking like this:
+Earlier this year, I finally set up a blog on my domain, having owned but left it unused for over a year.  My needs were simple:  it was to be a completely static site, hostable on GitHub Pages or Dropbox, and the focus of the project was in **no** way to be the technology or process of creating and maintaining it.  Despite the part of me that automatically geeked out at the opportunity to build my own completely custom blog generator from scratch, the point of doing it was to provide myself with a straightforward platform for *writing*, not to go on a technical adventure in creating one.  Although it only resulted in one post at first, the effort was successful: in about 2 hours, I'd set up [Octopress](http://octopress.org) and had it deplying to Pages.  It ended up looking like this:
 
-[image]
+<img class="img-responsive img-thumbnail blog-image" src="/img/crsmithdev_com_old.jpg"/>
 
-Not bad, but lacking in a few big ways.  The biggest was that I was underwhelmed with the themes available for Octopress, and still felt that a lot of the codebase of the site ended up being framework bits and boilerplate code from Octopress.  Quickly I realized that what I really wanted was an engine that would handle the conversion of Markdown to HTML with templates, but would otherwise stay out of the way and impose as little structure as possible.
+When I was finished, I found it usable but lacking in a few key ways, the biggest of which was that I was simply underwhlemed with the themes available for Octopress, and had little interest in building or heavily-modifying an Octopress theme.  Moreover, it felt very much like a monolithic framework, with bits of boilerplate code woven into most areas.  What I realized is that I really wanted a simple engine that would handle the work of converting Markdown to HTML with templates, but would otherwise stay out of the way as much as possible, impose little structure on the site, and most importantly, would leave me total control in designing what the output looked like.
 
-I was also eager to add a few more dimensions to the site.  A bio / about page was clearly needed, as was a project page to highlight some of the things I've worked on.  A responsive-first design is now a fundamental requirement for web development, and I needed a clearer yet tasteful advertisement of my social media presences.  Finally, as I've been significantly more active on GitHub recently, I thought an interesting feature to add might be a display of recent commits.
+I was also eager to address a few specific issues:
 
-Lastly, as Clojure is quickly eclipsing all others as my hacking language of choice, I very much wanted to see what the ecosystem might offer in terms of static site generation.
+- It was *only* a blog, lacking even a bio page.
+- Responsiveness was questionable.
+- Syntax highlighting was not supported.
+- I wanted to add a simple display of recent GitHub activity.
+
+Lastly, as Clojure is quickly eclipsing all others as my hacking language of choice, I very much wanted to see what the ecosystem might offer in terms of static site generation tools.
 
 ### Components
 
 In the end, I selected the following:
 
-- [Bootstrap 3](http://getbootstrap.com) - No better way to try it out, plus a responsive-first focus in 3.0
-- [Flatly](http://bootswatch.com/flatly/) theme from [Bootswatch](http://bootswatch.com/) - flat, simple and readable theme for Bootstrap.
-- [Static](https://github.com/nakkaya/static) - A tiny, embeddable static site generator in Clojure
-- [Font Awesome](http://fortawesome.github.io/Font-Awesome/) - Slick social media icons.
-- [highlight.js](http://softwaremaniacs.org/soft/highlight/en/) - Customizable syntax highlighting.
-
-Github has an [API](http://developer.github.com/) that allows unauthenticated access to developer activity, so there's no need for an account with them, and aside from the requisite jQuery for Bootstrap, there shouldn't really be a need to pull in any other JS libraries.
+- [Bootstrap 3](http://getbootstrap.com) - Newly released, rebuilt and responsive-first.
+- [Flatly](http://bootswatch.com/flatly/) theme from [Bootswatch](http://bootswatch.com/) - a flat, simple and readable theme for Bootstrap 3.
+- [Static](https://github.com/nakkaya/static) - A tiny, embeddable static site generator in Clojure.
+- [Font Awesome](http://fortawesome.github.io/Font-Awesome/) - high-quality icons, here specifically for social media networks. 
+- [google-code-prettify](https://code.google.com/p/google-code-prettify/) - code syntax highlighting.
 
 ### Static
 
