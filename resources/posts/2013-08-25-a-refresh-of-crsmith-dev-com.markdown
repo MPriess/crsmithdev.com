@@ -6,11 +6,11 @@ title: A refresh of crsmithdev.com with Bootstrap and Static
 
 ### Previously
 
-Earlier this year, I finally set up a blog on my domain, having owned but left it unused for over a year.  My needs were simple:  it was to be a completely static site, hostable on GitHub Pages or Dropbox, and the focus of the project was in **no** way to be the technology or process of creating and maintaining it.  Despite the part of me that automatically geeked out at the opportunity to build my own completely custom blog generator from scratch, the point of doing it was to provide myself with a straightforward platform for *writing*, not to go on a technical adventure in creating one.  Although it only resulted in one post at first, the effort was successful: in about 2 hours, I'd set up [Octopress](http://octopress.org) and had it deplying to Pages.  It ended up looking like this:
+Earlier this year, I finally set up a blog on my domain, having owned but left it unused for over a year.  My needs were simple:  it was to be a completely static site, hostable on GitHub Pages or Dropbox, and the focus of the project was in **no** way to be the technology or process of creating and maintaining it.  Despite the part of me that automatically geeked out at the opportunity to build my own completely custom blog generator from scratch, the point of doing it was to provide myself with a straightforward platform for *writing*, not to go on a technical adventure in creating one.  Although I've only written two posts on it so far, the effort was successful: in about 2 hours, I'd set up [Octopress](http://octopress.org) and had it deploying to Pages.  The result looked like this:
 
 <img class="img-responsive img-thumbnail blog-image" src="/img/crsmithdev_com_old.jpg"/>
 
-When I was finished, I found it usable but lacking in a few key ways, the biggest of which was that I was simply underwhlemed with the themes available for Octopress, and had little interest in building or heavily-modifying an Octopress theme.  Moreover, it felt very much like a monolithic framework, with bits of boilerplate code woven into most areas.  What I realized is that I really wanted a simple engine that would handle the work of converting Markdown to HTML with templates, but would otherwise stay out of the way as much as possible, impose little structure on the site, and most importantly, would leave me total control in designing what the output looked like.
+I found it usable but lacking in a few key ways, the most significant of which was that I was simply underwhlemed with the themes available for Octopress, and had little interest in building or heavily-modifying an Octopress theme.  Moreover, it felt very much like a monolithic framework, with bits of boilerplate code strewn about my site repo.  What I realized is that I really wanted a simple engine that would handle the work of converting Markdown to HTML with templates, but would otherwise stay out of the way as much as possible, impose little structure on the site, and most importantly, would leave me total control in designing what the output looked like.
 
 I was also eager to address a few specific issues:
 
@@ -44,15 +44,17 @@ Here's all that's needed to get started with Static:
     lein deps
     lein uberjar
 
-This results with a .jar named `static-app.jar` in the `target` directory, which can then be moved into a fresh site repo:
+This results in a .jar named `static-app.jar` in the `target` directory, which can then be copied into a fresh repo for a site:
 
 <!--?prettify lang=sh-->
 
+    cd ..
     mkdir crsmithdev.com
+    cd crsmithdev.com
     git init
     cp ../static/target/static-app.jar .
 	
-Here's the minimum directory structure and files necessary to start building a site:
+Here's the minimum directory structure and files necessary to get started:
 
     .
     |-- config.clj
@@ -65,11 +67,11 @@ Here's the minimum directory structure and files necessary to start building a s
 
 A brief description of what all these are:
 
-- `config.clj` contains global site configuration options
-- **posts** contains the actual blog post files, in markdown or org-mode format.
-- **public** will have its directory contents copied to the root of the generated site, so this is where css, js directories should be placed.
-- **site** should contain templates (Hiccup, here) for fragments of non-blog-post pages of the site.  In my case, this means some files named index.clj, about.clj, etc.
-- **templates** should contain templates for rendering both posts and other pages in the site.
+- `config.clj` - global site configuration options.
+- `posts` - blog posts, in markdown or org-mode format.
+- `public` - public site resources and directories (`js`, `css`, etc.), to be copied to the root of the generated site.
+- `site` - Hiccup templates for the content of non-blog-post pages.
+- `templates` - Hiccup templates for all pages.
 
 All that's needed to build the site is this:
 
@@ -77,23 +79,49 @@ All that's needed to build the site is this:
 
     java -jar static-app.jar --build
 
-Or, to rebuild automatically when something is changed:
+The `--watch` option can be used to rebuild automatically when a file changes.  When the site builds, the output should look like this:
 
-<!--?prettify lang=sh-->
 
-    java -jar static-app.jar --watch
+    [+] INFO: Using tmp location: /var/folders/r5/30xb2fj573b_s9_2f18y4s_00000gn/T/static/
+    [+] INFO: Processing Public  0.011 secs
+    [+] INFO: Processing Site  0.213 secs
+    [+] INFO: Processing Posts  0.695 secs
+    [+] INFO: Creating RSS  0.07 secs
+    [+] INFO: Creating Tags  0.03 secs
+    [+] INFO: Creating Sitemap  0.0040 secs
+    [+] INFO: Creating Aliases  0.01 secs
+    [+] INFO: Build took  1.034 secs
 
-This will result in an 'html' directory appearing in the root of the site, containing the rendered HTML pages.  I found pointing my local nginx at this folder to be the best way to serve the site locally, although Static does offer a `--jetty` option to run it as well.
+An `html` directory will be created in the root of the site, containing all the generated HTML.  I found that pointing my local nginx at this folder was the most straightforward way to serve the site locally while working on it, although Static does offer a `--jetty` option to serve it as well.
 
-Blog post configuration is extremely simple, and should be familiar to anyone who has used Markdown for blogging.  Each post will simple require a short header with a few configuration values, as shown here:
+The contents of my config.clj are as follows (note that it is possible to modify the expected directory structure here as well):
+
+<!--?prettify lang=clj-->
+
+    [:site-title "crsmithdev.com"
+     :site-description "crsmithdev.com"
+     :site-url "http://crsmithdev.com"
+     :in-dir "resources/"
+     :out-dir "html/"
+     :default-template "default.clj"
+     :encoding "UTF-8"
+     :blog-as-index false
+     :create-archives false
+     :atomic-build true]
+
+Blog posts require only a simple header with some metadata, as shown below:
 
     ---
     title: Building Better Email Habits with Mailbox
     ---
 
-Static's [documentation](http://nakkaya.com/static.html) lists a few more options for the post header, allowing the specification of tags, an alias, and use of non-default templates.
+Static's [documentation](http://nakkaya.com/static.html) lists a few more options here, including the specification of tags, an alias, a non-default template, and more.
 
 ### HTML templating with Hiccup
+
+Static uses [Hiccup](https://github.com/weavejester/hiccup), a great templating library for Clojure, to specify the structure of pages it generates.  Having never used it before, I instantly found it to be very natural and efficient &mdash; the sytax is extremely minimal, vectors and maps are used for element and their attributes, respectively, and it is very easy to embed other Clojure code amongst element definitions.
+
+Here's what the first few lines of my default template look like:
 
 <!--?prettify lang=clj-->
 
@@ -108,7 +136,7 @@ Static's [documentation](http://nakkaya.com/static.html) lists a few more option
       [:link {:rel "icon" :href "/images/favicon.ico" :type "image/x-icon"}]
       [:link {:rel "shortcut icon" :href "/images/favicon.ico" :type "image/x-icon"}]
 
-Note the access of the `:description` and `:tags` from `metadata`.
+Note the access of the `:description` and `:tags` from `metadata`.  Static injects a few values into page rendering, specifically `metadata` and `content`.  `metadata` provides some information about what kind of page is being rendered, while `content` is the actual Markdown or Hiccup-generated content that the template will include.  Because of this, it is possible to specify different behaviors depending on what is being rendered:
 
 <!--?prettify lang=clj-->
 
@@ -123,7 +151,7 @@ Note the access of the `:description` and `:tags` from `metadata`.
 		   "// ... (disqus js)"]]]
 		content)
 
-Here, some extra structure for Bootstrap, and the embedded code for Disqus, are injected in the page, but only if its `metadata` `:type` indicates that it is a post.  Also, note the terse syntax for Hiccup:  this is actually a 'short' form of ID / class specification it offers, which makes these two forms equivalent:
+Above, a simple Bootstrap grid is created if the content of the page is a post, and then followed by the standard JS to include Disqus comments on the page.  Note the terse syntax for specifying element classes:  this is actually one of two possible syntaxes to define classes and ids.  Below, these two forms are equivalent:
 
 <!--?prettify lang=clj-->
 
@@ -132,15 +160,23 @@ Here, some extra structure for Bootstrap, and the embedded code for Disqus, are 
 
 ### Bootstrap 3, Font Awesome, and theming
 
-Fortunately, Bootstrap 3 was nearing release as I was beginning to work on the site, so I grabbed the RC2 version and went to work.  [Bootswatch](http://bootswatch.com/) provides a nice selection of attractive, free themes for Bootstrap 3, of which I picked [Flatly](http://bootswatch.com/flatly/).  As there are plenty of examples / tutorials on how to set up basic layouts with Bootstrap there's little need for one here.
+Fortunately, Bootstrap 3 was nearing release as I was beginning to work on the site, so I grabbed the RC2 version and went to work.  [Bootswatch](http://bootswatch.com/) provides a nice selection of attractive, free themes for Bootstrap 3, of which I picked [Flatly](http://bootswatch.com/flatly/). Although Bootstrap does include the free version of [Glyphicons](http://glyphicons.com/), I've used [Font Awesome](http://fortawesome.github.io/Font-Awesome/) extensively both a work and personally, and find the selection both much larger and of higher quality.  It has built-in, high-quality icons for Twitter, GitHub and LinkedIn (amongst many, many others), making it an easy choice here.
 
-Although Bootstrap does include the free version of [Glyphicons](http://glyphicons.com/), I've used [Font Awesome](http://fortawesome.github.io/Font-Awesome/) extensively both a work and personally, and find the selection both much larger and of higher quality.  It has built-in, high-quality icons for Twitter, GitHub and LinkedIn (amongst many, many others), making it an easy choice here.
+There are plenty of great starting points / tutorials already out there for Bootstrap (I'd recommend this [starter template](http://getbootstrap.com/getting-started/#template)), and the use of it here is quite simple.  However, I did make a few notable alterations to the Flatly theme, with the goal of making the site a bit easier on the reader's eyes and more suitable for text-dense pages:
+
+- Changed the standard font to **Source Sans Pro** (from the default **Lato**), both of which are available from [Google Fonts](http://www.google.com/fonts).  Source Sans Pro is a bit lighter and wider, and feels easier to read.
+- Changed the code font to **Source Code Pro** (from the default **Monaco**).  Source Code Pro is my favorite fixed-width font, I use it as the font in all my editors and find it to be extremely readable.
+- Bumped the font size to 1.7em.
+- Increased line-height to 28px.
+- Narrowed the container max-width to 960px.
+
+I found these resulted in a much more pleasant reading experience.
 
 ### Github Activity
 
-While there are some JS libraries for the GitHub API, my needs were quite simple here and I was unwilling to introduce more dependencies for a simple, static site.  As there's no need to register with GitHub to use the part of the API I was needing, it should be possible to retrieve, parse and display a list of recent activity using a single `$.ajax` request and some vanilla JavaScript.
+While there are some JS libraries to access the GitHub API, my needs were so simple that I was unwilling to introduce additional dependencies to just perform one AJAX call and parse a little bit of JSON.  Note that while GitHub does provide public, un-authenticated access to developer activity, clients are rate limited to 60 requests per IP per hour.
 
-The full code to retrieve, process and display my GitHub commits can be found [here](https://github.com/crsmithdev/crsmithdev.github.com/blob/master/js/crsmithdev.js), but here are some highlights.  I'll need a function to retrieve some JSON from GitHub, transform that data into a list of DOM elements, and then apply those elements to any containers matching a certain CSS selector.  And of course, I'll want to limit the number of commits that are displayed:
+The full code to retrieve, process and display my GitHub commits can be found [here](https://github.com/crsmithdev/crsmithdev.github.com/blob/master/js/crsmithdev.js), but here are some highlights.  I needed a function to retrieve some JSON from GitHub, transform that data into a list of DOM elements, and then apply those elements to any containers matching a certain CSS selector.  And of course, it's important to limit the number of commits that are displayed:
 
 <!--?prettify lang=js-->
 
@@ -159,7 +195,7 @@ The full code to retrieve, process and display my GitHub commits can be found [h
         }
     };
 
-For actually generating elements from JSON, I could have used libraries like [underscore.js](http://underscorejs.org) and [moment.js](http://momentjs.org) to handle things like iteration, templating and date formatting, and I normally would have these in scope in a larger project.  Here, though, I see little reason to involve two more libraries for a few simple operations.  Parsing the JSON is straightforward, as every event that involves a commit will have a `payload.commit` property containing an array of commmits.  Using arrays and a native `.join()` function should be preferred to string concatenation, in the absence of templating:
+For actually generating elements from JSON, I could have used libraries like [underscore.js](http://underscorejs.org) and [moment.js](http://momentjs.org) to handle things like iteration, templating and date formatting, and I normally would have these in scope in a larger project.  Since I'm without them here, though, everything is done in vanilla JS. Parsing the JSON is straightforward, as every event that involves a commit will have a `payload.commit` property containing an array of commmits.  Using arrays and a native `.join()` function should be preferred to string concatenation, in the absence of templating:
 
 <!--?prettify lang=js-->
 
@@ -176,7 +212,7 @@ For actually generating elements from JSON, I could have used libraries like [un
         elements.push($(arr.join('')));
     }
 
-Dates are handled with a simple function and an array of month names.  The GitHub API provides dates in ISO 8601 format (YYYY-MM-DDThh:mm:ssZ):
+Dates are handled with a simple function and an array of month names.  The GitHub API provides dates in ISO-8601 format (YYYY-MM-DDThh:mm:ssZ), so it's easy to extract the year, month, and day:
 
 <!--?prettify lang=js-->
 
@@ -207,7 +243,9 @@ And of course, all this is wrapped in a module that exposes only one public meth
 
 ### Syntax Highlighting
 
-Finally, some quality syntax highlighting was needed.  I selected [google-code-prettify](https://code.google.com/p/google-code-prettify/).  All it requires to highlight syntax are a few classes:
+Originally I attemped to use [highlight.js](http://softwaremaniacs.org/soft/highlight/en/), but quickly found it to be problematic:  nearly all of the guesses it made about what kind of syntax was being presented were wrong, and it was difficult to override its default guessing behavior, especially given that I was writing the posts in Markdown, not raw HTML.  Fortunately, [google-code-prettify](https://code.google.com/p/google-code-prettify/) was a much more usable option, even though it does require an [extension](https://code.google.com/p/google-code-prettify/source/browse/trunk/src/lang-clj.js) to handle Clojure.
+
+If I *were* writing HTML, using google-code-prettify would look something like this:
 
 <!--?prettify lang=html-->
 
@@ -220,7 +258,7 @@ Finally, some quality syntax highlighting was needed.  I selected [google-code-p
          ; ...
     </code></pre>
 
-Unfortunately, as posts are being written in Markdown, I can't add those classes to the automatically generated code blocks, and although I could use literal HTML in Markdown to manually define everything, then I would have to worry about angle brackets and other characters that would have to be escaped.  Fortunately, google-code-prettify allows the use of directives in comments to hint at what should be prettified, and with what language.  This means I can write the Markdown to produce the above like so:
+But since I want to do this in Markdown, the situation is different.  There's no way to add a class to the auto-generated `<pre><code>...</code></pre>` blocks, and although I could use literal HTML instead, that brings with it some other issues (angle brackets in code then have to be manually escaped, for example).  Fortunately, google-code-prettify allows the use of directives in HTML comments preceding code blocks, meaning I can just write this in my posts:
 
     <!--?prettify lang=clj-->
 
@@ -231,19 +269,18 @@ Unfortunately, as posts are being written in Markdown, I can't add those classes
           [:li "Functional programming"]
           ; ...
 
-Note that a separate download is required for Clojure support, as it is provided by an extension.
 
 ### Deployment
 
-Deployment is extremely straightforward.  I cleared out my existing [crsmithdev.github.com](https://github.com/crsmithdev/crsmithdev.github.com), and copied over all the files from the `html` directory, being sure to add a CNAME file referencing my [crsmithdev.com](http://crsmithdev.com) domain so Pages will work correctly under it.  One push later and all was up and running.
+Deployment to GitHub Pages was very straightforward.  I nuked my existing [crsmithdev.github.com](https://github.com/crsmithdev/crsmithdev.github.com) master and copied over all the files from the `html` directory, being sure to add a CNAME file referencing my [crsmithdev.com](http://crsmithdev.com) domain so Pages would work currently under it.  One push and the site was up and running.
 
 ### Future work
 
-I'm much happier with the look and feature set of the site now
+I'm much happier with the site now, but still see some areas for improvement:
 
-- I think the load times could definitely be improved, especially considering this is a static site.  I'll likely have a future post on optimization.
-- I need to take a look at how highlight.js both identifies various types of languages, as well as adjust the colors it uses.
-- Put simply, I just need to write more!
+- Some optimizations could definitely improve load times.  I'll likely write a future post about this.
+- I'd very much like to be able to partially render blog posts on the index page (a title and two paragraphs or so).
+- Simply put, I need to write more.
 
-Of course, the last is the most difficult of the three for me...which also means it is the most important.
+Of course, the last of these is the most difficult for me, which is often a sign that it is the most important.
 
