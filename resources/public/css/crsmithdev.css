@@ -26,6 +26,11 @@ body {
     margin-bottom: 15px;
 }
 
+.blog-date {
+    margin-top: 0px;
+    margin-bottom: 15px;
+}
+
 pre {
     color: #000;
     margin-top: 20px;
