@@ -41,6 +41,9 @@
       [:div.row
        [:div.col-md-12
         content
+        [:div.shares
+         [:a.twitter-share-button {:href "https://twitter.com/share" :data-via "crsmithdev"} "Tweet"]]
+        [:br]
         [:div#disqus_thread]
         [:script {:type "text/javascript"}
          "var disqus_shortname = 'crsmithdev';"
@@ -50,7 +53,11 @@
             "var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;"
             "dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';"
             "(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);"
-         "})();"]]]
+         "})();"]
+        [:script {:type "text/javascript"}
+         "!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';"
+         "if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';"
+         "fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');"]]]
       content)
     [:script {:src "//cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"}]
     [:script {:src "//cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.0.0-rc2/js/bootstrap.min.js"}]

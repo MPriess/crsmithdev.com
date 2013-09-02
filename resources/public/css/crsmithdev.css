@@ -16,6 +16,16 @@ body {
     display: block;
 }
 
+.shares {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+#disqus_thread {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
 pre {
     color: #000;
     margin-top: 20px;
