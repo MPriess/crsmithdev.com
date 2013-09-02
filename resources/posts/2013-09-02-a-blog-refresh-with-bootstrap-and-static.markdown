@@ -1,8 +1,8 @@
 ---
-title: A blog refresh with Bootstrap and Static
+title: A Blog Refresh with Bootstrap and Static
 ---
 
-## A blog refresh with Bootstrap 3 and Static
+## A Blog Refresh with Bootstrap 3 and Static
 
 ### Previously
 

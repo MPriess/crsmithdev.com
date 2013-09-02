@@ -10,7 +10,7 @@
                      "yyyy-MM-dd" "dd MMM yyyy"
                      (re-find #"\d*-\d*-\d*" (str f)))]
       [:div
-       [:h4 [:a {:href url} (:title metadata)]]
+       [:h4.blog-title [:a {:href url} (:title metadata)]]
        [:h5.blog-date date]])
       (take 8 (reverse (static.io/list-files :posts))))
    ]]]

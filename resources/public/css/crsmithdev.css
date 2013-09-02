@@ -26,7 +26,11 @@ body {
     margin-bottom: 15px;
 }
 
-.blog-date {
+h4.blog-title {
+    margin-bottom: 3px;
+}
+
+h5.blog-date {
     margin-top: 0px;
     margin-bottom: 15px;
 }
