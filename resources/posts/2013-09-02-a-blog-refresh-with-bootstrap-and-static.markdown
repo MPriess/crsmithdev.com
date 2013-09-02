@@ -10,7 +10,7 @@ Earlier this year, I finally set up a blog on my domain, having owned but left i
 
 <img class="img-responsive img-thumbnail blog-image" src="/img/crsmithdev_com_old.jpg"/>
 
-I found it usable but lacking in a few key ways, the most significant of which was that I was simply underwhlemed with the themes available for Octopress, and had little interest in building a new or heavily-modifying an existing Octopress theme.  Moreover, it felt very much like a monolithic framework, into a tiny corner of which were tucked the contents of my blog.  I realized that what I wanted was a simple engine that would handle the work of converting Markdown to HTML and stitching the results together with templates, but would otherwise stay out of the way as much as possible, impose little structure and even less of its own code on me, and give me total control over the design without relying on themeing.
+I found it usable but lacking in a few key ways, the most significant of which was that I was simply underwhelmed with the themes available for Octopress, and had little interest in building a new theme or heavily modifying an existing one.  Moreover, it felt very much like a monolithic framework, into a tiny corner of which were tucked the contents of my blog.  I realized that what I wanted was a simple engine that would handle the work of converting Markdown to HTML and stitching the results together with templates, but would otherwise stay out of the way as much as possible, impose little structure and even less of its own code on me, and give me total control over the design without relying on theming.
 
 I was also eager to address a few specific issues:
 
@@ -109,7 +109,7 @@ An `html` directory will be created in the root of the site, containing all the 
 
 ### HTML templating with Hiccup
 
-Static uses [Hiccup](https://github.com/weavejester/hiccup), a great templating library for Clojure, to specify the structure of pages it generates.  Having never used it before, I instantly found it to be very natural and efficient &mdash; the sytax is extremely minimal, vectors and maps are used for elements and their attributes, respectively, and it's possible to embed Clojure code right along with element definitions.
+Static uses [Hiccup](https://github.com/weavejester/hiccup), a great templating library for Clojure, to specify the structure of pages it generates.  Having never used it before, I instantly found it to be very natural and efficient &mdash; the syntax is extremely minimal, vectors and maps are used for elements and their attributes, respectively, and it's possible to embed Clojure code right along with element definitions.
 
 Here's what the first few lines of my default template look like:
 
@@ -141,7 +141,7 @@ Note the access of the `:description` and `:tags` from `metadata`.  Static injec
 		   "// ... (disqus js)"]]]
 		content)
 
-Above, a simple Bootstrap grid is created if the content of the page is a post, and then followed by the standard JS to include Disqus comments on the page.  Note the terse syntax for specifying element classes:  this is actually one of two possible syntaxes to define classes and ids.  Below, these two forms are equivalent:
+Above, if the page is a post, a simple Bootstrap grid is created, followed by the standard JS to include Disqus comments.  Note the terse syntax for specifying element classes:  this is actually one of two possible syntaxes to define classes and ids.  Below, these two forms are equivalent:
 
 <!--?prettify lang=clj-->
 
@@ -202,7 +202,7 @@ The full code to retrieve, process and display my GitHub commits can be found [h
         }
     };
 
-Parsing the JSON is straightforward, as every event that involves a commit will have a `payload.commit` property containing an array of commmits.  Using arrays and a native `.join()` function should be preferred to string concatenation, in the absence of templating:
+Parsing the JSON is straightforward, as every event that involves a commit will have a `payload.commit` property containing an array of commits.  Using arrays and a native `.join()` function should be preferred to string concatenation, in the absence of templating:
 
 <!--?prettify lang=js-->
 
@@ -250,7 +250,7 @@ And of course, all this is wrapped in a module that exposes only one public meth
 
 ### Syntax Highlighting
 
-Originally I attemped to use [highlight.js](http://softwaremaniacs.org/soft/highlight/en/), but quickly ran into issues:  nearly all of the guesses it made about what kind of syntax was being presented were wrong, and it was difficult to override its default guessing behavior, especially given that I was writing the posts in Markdown, not raw HTML.  Fortunately, [google-code-prettify](https://code.google.com/p/google-code-prettify/) was a much more usable option, even though it does require an [extension](https://code.google.com/p/google-code-prettify/source/browse/trunk/src/lang-clj.js) to handle Clojure.
+Originally I attempted to use [highlight.js](http://softwaremaniacs.org/soft/highlight/en/), but quickly ran into issues:  nearly all of the guesses it made about what kind of syntax was being presented were wrong, and it was difficult to override its default guessing behavior, especially given that I was writing the posts in Markdown, not raw HTML.  Fortunately, [google-code-prettify](https://code.google.com/p/google-code-prettify/) was a much more usable option, even though it does require an [extension](https://code.google.com/p/google-code-prettify/source/browse/trunk/src/lang-clj.js) to handle Clojure.
 
 If I posts *were* written HTML, using google-code-prettify would look something like this:
 
