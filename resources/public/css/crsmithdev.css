@@ -1,12 +1,11 @@
 body {
     padding-top: 60px;
-    font-size: 1.7em;
     font-family: 'Open Sans', sans-serif;
-    line-height: 28px;
+    line-height: 24px;
 }
 
 .container {
-    max-width: 960px;
+    max-width: 840px;
 }
 
 .blog-image {
