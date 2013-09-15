@@ -1,5 +1,6 @@
 ---
 title: A Blog Refresh with Bootstrap and Static
+tags: clojure static blog markdown hiccup bootstrap github javascript design
 ---
 
 ## A Blog Refresh with Bootstrap 3 and Static

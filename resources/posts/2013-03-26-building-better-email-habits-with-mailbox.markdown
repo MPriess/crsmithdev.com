@@ -1,5 +1,6 @@
 ---
 title: Building Better Email Habits with Mailbox
+tabs: mailbox email behavior iphone psychology
 ---
 
 ## Building Better Email Habits with Mailbox

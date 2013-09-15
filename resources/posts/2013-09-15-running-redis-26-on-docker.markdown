@@ -1,5 +1,6 @@
 ---
 title: Running Redis 2.6 on Docker
+tags: docker redis ubuntu
 ---
 
 ## Running Redis 2.6 on Docker
