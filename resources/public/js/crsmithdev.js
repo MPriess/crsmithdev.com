@@ -45,7 +45,7 @@ var ghActivity = (function() {
 		for (var j = 0; j < event.payload.commits.length; ++j) {
 		    var commit = event.payload.commits[j];
 
-		    var arr = ['<div><div><a href=https://github.com/"', event.repo.name, '/commit/',
+		    var arr = ['<div><div><a href="https://github.com/', event.repo.name, '/commit/',
 			commit.sha, '">', commit.message, '</a> <span class="text-muted">', repo,
 			'</span></div>', '<div>', date,	'</div></div>'];
 
