@@ -56,7 +56,7 @@ Verify the server is working by running the following:
 
 ### Adding run arguments to the image
 
-In the example, the resulting container is commited to an image and run like so:
+In the example, the resulting container is committed to an image and run like so:
 
     sudo docker commit <container_id> crsmithdev/redis
     sudo docker run -d -p 6379 crsmithdev/redis /usr/bin/redis-server
