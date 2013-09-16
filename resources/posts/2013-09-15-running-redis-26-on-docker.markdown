@@ -20,14 +20,13 @@ To get a sense of what Docker is and how it works, I'd recommend going through t
 - Images are lightweight, perhaps 100Mb for a Redis server running on Ubuntu.
 - Containers are not virtual machines, so they are lightening-fast to boot and lightweight on resources.
 
-One of the documentation examples describes setting up a [Redis](http://redis.io) service.  Following the example was straightforward, but I felt it was missing two things when I was finished.  First, it uses Redis 2.4, which is already quite out of date (as of this writing, Redis 2.8 is nearing release).  And second, it still required some parameters passed in order to actually launch the container, including the `redis-server` path and port, which seemed unnecessary.  Fortunately, I found it was easy to address both of these, and was a great introduction to using Docker. 
-
+One of the documentation examples describes setting up a [Redis](http://redis.io) service.  Following the example was straightforward, but I felt it was missing two things when I was finished.  First, it uses Redis 2.4, which is already quite out of date (as of this writing, Redis 2.8 is nearing release).  And, there are a few more interesting options Docker provides that weren't used.
 
 ### Installing Redis 2.6
 
 The first thing to do is start a container from a base image, in this case the `ubuntu` image pulled during setup:
 
-    docker run -i -t ubuntu /bin/bash
+    sudo docker run -i -t ubuntu /bin/bash
 
 This results in a root shell on a new, running Ubuntu container.  A few things will be needed in order to download, build and test Redis:
 
@@ -55,23 +54,45 @@ Verify the server is working by running the following:
     redis-server /etc/redis/redis.conf
 
 
-### Adding run arguments to the image
+### Run commands and images 
 
-In the example, the resulting container is committed to an image and run like so:
+In the example, the resulting container is committed to an image, and then run:
 
     sudo docker commit <container_id> crsmithdev/redis
-    sudo docker run -d -p 6379 crsmithdev/redis /usr/bin/redis-server
+    sudo docker run -d -p 6379 crsmithdev/redis2.6 /usr/bin/redis-server /etc/redis/redis.conf
 
-However, it makes more sense to me that it **always** runs on port 6379, and `redis-server` is the only command this container should ever be running.  Here's an alternate way to commit the container that addresses both these issues:
+This is still a bit clunky &mdash; why do `redis-server` and the config file have to be specified each time it's run?  Forunately, they can be built into the image itself:
 
-    sudo docker commit -run='{"Cmd":["/usr/local/bin/redis-server", "/etc/redis/redis.conf"] \
-        "PortSpecs":["6379"]}' <container_id> crsmithdev/redis2.6
+    sudo docker commit -run='{"Cmd":["/usr/local/bin/redis-server", "/etc/redis/redis.conf"]}' \
+        <container_id> crsmithdev/redis2.6
 
-With that, you can run the container with no arguments:
+That way, you can run the container like so:
 
-    sudo docker run -d crsmithdev/redis2.6
+    sudo docker run -d -p 6379:6379 crsmithdev/redis2.6
 
-Then, connect with `redis-cli` and verify that it's running correctly.
+Specifying -p 6379:6379 ensures that the server's port 6379 is mapped to the container's port 6379.  Otherwise, Docker will assign a random local server port in the 49000s, which is probably unwanted in most non-development environments.
+
+Note that it is still possible to override the image-specified run command.  The following will open a shell using the image, instead of launching Redis:
+
+    sudo docker run -i -t crsmithdev/redis2.6 /bin/bash
+
+### Handling data
+
+One important point:  what about the data and log files that result from the Redis process?  Every time I run Redis from that image, I get a new container with fresh data.  That's ideal for some situations, but less so for for others: in a production environment, it's entirely possible I'd want to be able to start a new Redis container, but be able to load a dumpfile from a previous one.
+
+Fortunately, you can share one or more volumes with the host server easily.  Modify `redis.conf` on the container to specify a dumpfile location of your choice:
+
+    dir /data/redis
+
+Then, run the image specifying a mount point on the server:
+
+    sudo docker run -d -p 6379:6379 -v /mnt/redis:/data/redis:rw crsmithdev/redis2.6
+
+Connecting via `redis-cli` and executing `SAVE` should result in a `dump.rdb` file in `/mnt/redis`.  Redis will be logging to stdout unless specified otherwise, so the logs are viewable using a Docker command:
+
+    sudo docker logs <container_d>
+
+If you specify a different logfile location in `redis.conf`, it's possible to add a second volume to the `run` command.
 
 ### Fin!
 
