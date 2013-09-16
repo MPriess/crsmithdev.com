@@ -20,7 +20,7 @@ To get a sense of what Docker is and how it works, I'd recommend going through t
 - Images are lightweight, perhaps 100Mb for a Redis server running on Ubuntu.
 - Containers are not virtual machines, so they are lightening-fast to boot and lightweight on resources.
 
-One of the documentation examples describes setting up a [Redis](http://redis.io) service.  Following the example was straightforward, but I felt it was missing two things when I was finished.  First, it uses Redis 2.4, which is already quite out of date (as of this writing, Redis 2.8 is nearing release).  And, there are a few more interesting options Docker provides that weren't used.
+One of the documentation examples describes setting up a [Redis](http://redis.io) service.  Following the example was straightforward, but I felt it was missing two things when I was finished.  First, it uses Redis 2.4, which is already quite out of date (as of this writing, Redis 2.8 is nearing release).  Plus, it felt awkward having to specify a lengthy command and config file each time the container started.
 
 ### Installing Redis 2.6
 
