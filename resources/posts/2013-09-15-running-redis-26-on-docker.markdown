@@ -99,3 +99,5 @@ If you specify a different logfile location in `redis.conf`, it's possible to ad
 And that's it.  This image can then be downloaded and started, producing a running, fully-functional Redis server in literally a few seconds.
 
 You can grab my image [here](https://index.docker.io/u/crsmithdev/redis2.6/).
+
+**UPDATE 9-15 - updated container run arguments, and added a bit about volumes.**
